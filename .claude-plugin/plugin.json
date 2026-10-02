@@ -1,0 +1,13 @@
+{
+  "name": "agent-memory",
+  "version": "0.1.0",
+  "description": "Persistent per-project memory for coding work: facts, decisions and rules of each project with sources and freshness. Read automatically by hooks; written only by the task's single executor.",
+  "author": {
+    "name": "CRMGPT",
+    "url": "https://github.com/CRMGPT"
+  },
+  "homepage": "https://github.com/CRMGPT/agent-memory",
+  "repository": "https://github.com/CRMGPT/agent-memory",
+  "license": "MIT",
+  "keywords": ["memory", "project-memory", "knowledge", "hooks", "agents"]
+}

@@ -1,0 +1,9 @@
+class AuthService:
+    def rotate_token(self, user_id, old_token):
+        new_token = self.issue(user_id)
+        self.store.delete(old_token)
+        self.store.set(new_token, user_id)
+        return new_token
+
+    def issue(self, user_id):
+        return f"tok-{user_id}"

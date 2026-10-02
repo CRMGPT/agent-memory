@@ -1,0 +1,122 @@
+{
+ "id": "episode_000001",
+ "scope": "repo-7f9403",
+ "task": "record auth facts",
+ "status": "committed",
+ "frame": {
+  "task": "record auth facts",
+  "entities": [],
+  "concepts": [
+   "record",
+   "auth",
+   "fact"
+  ],
+  "files": [],
+  "systems": [],
+  "constraints": [],
+  "search_terms": [
+   "record auth",
+   "auth facts",
+   "record",
+   "auth",
+   "fact"
+  ]
+ },
+ "started_at": "2026-10-01T06:01:09+00:00",
+ "ended_at": "2026-10-01T06:01:09+00:00",
+ "injected": [],
+ "notes": [],
+ "diff": {
+  "ops": [
+   {
+    "op": "ADD",
+    "ref": "d",
+    "record": {
+     "type": "DECISION",
+     "statement": "Rotation must be atomic",
+     "subject": "auth.rotation",
+     "evidence": [
+      {
+       "kind": "code",
+       "ref": "AuthService.rotate_token"
+      },
+      {
+       "kind": "doc",
+       "ref": "docs/auth.md",
+       "locator": "L3-L3"
+      }
+     ],
+     "links": [
+      {
+       "rel": "AFFECTS",
+       "to": "AuthService.rotate_token"
+      }
+     ]
+    }
+   },
+   {
+    "op": "ADD",
+    "record": {
+     "type": "FACT",
+     "statement": "Tokens are JWT",
+     "subject": "auth.format",
+     "evidence": [
+      {
+       "kind": "commit",
+       "ref": "8e484a7e8f86401858550b12b2853e733e2257af"
+      }
+     ]
+    }
+   },
+   {
+    "op": "ADD",
+    "record": {
+     "type": "FACT",
+     "statement": "Gateway timeout is 2 s",
+     "evidence": [
+      {
+       "kind": "user",
+       "ref": "owner",
+       "note": "said in chat"
+      }
+     ]
+    }
+   },
+   {
+    "op": "ADD",
+    "record": {
+     "type": "HYPOTHESIS",
+     "statement": "Duplicate delivery causes the race"
+    }
+   }
+  ]
+ },
+ "summary": "auth facts recorded",
+ "commit_report": {
+  "added": [
+   "decision_00001",
+   "fact_00001",
+   "fact_00002",
+   "hypothesis_00001",
+   "episode_summary_00001"
+  ],
+  "confirmed": [],
+  "duplicates_converted": [],
+  "updated": [],
+  "invalidated": [],
+  "superseded": [],
+  "resolved": [],
+  "linked": [
+   {
+    "from": "decision_00001",
+    "rel": "AFFECTS",
+    "to": "code:app/auth/service.py::AuthService.rotate_token",
+    "origin": "asserted"
+   }
+  ],
+  "unlinked": [],
+  "warnings": []
+ },
+ "working_before": "# Goal\n\n\n# Current task\n\n\n# Current state\n\n\n# Important constraints\n\n\n# Active hypotheses\n\n\n# Decisions relevant to current work\n\n\n# Open questions\n\n\n# Current plan\n",
+ "working_submitted": null
+}
