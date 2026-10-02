@@ -61,7 +61,76 @@ def diff_identity(diff: dict, episode: str | None) -> tuple[str, str]:
     return (diff.get("diff_id") or f"auto:{episode or '-'}:{chash[:32]}"), chash
 
 
+DIFF_FORMS = ('a list of records [{"type": ..., "section": ..., "statement": ..., "evidence": [...]}], '
+              'one such record, or {"ops": [{"op": "ADD", "record": {...}}, ...]}')
+
+
+def _need_evidence_list(value, where: str) -> None:
+    """Доказательство — объект или строка `вид:ссылка` (её разбирает Memory._norm_evidence)."""
+    if value is not None and (not isinstance(value, list) or not all(isinstance(v, (dict, str)) for v in value)):
+        raise S.ValidationError(f"{where} must be a list of objects (or `kind:ref` strings)")
+
+
+def _need_links(value, where: str) -> None:
+    if value is not None and (not isinstance(value, list) or not all(
+            isinstance(v, dict) and isinstance(v.get("to"), str) for v in value)):
+        raise S.ValidationError(f'{where} must be a list of objects like {{"rel": ..., "to": "<id or code>"}}')
+
+
+def normalize_diff(raw: Any) -> dict | None:
+    """Файл для `end --diff` и `commit` в одной из трёх форм — к полному виду {"ops": [...]}.
+
+    * список записей — ADD для каждой, порядок сохраняется;
+    * одна запись (объект с `type` или `statement`, без `op`/`ops`) — один ADD;
+    * полный дифф {"ops": [...]} — как есть; пустой объект (или только `diff_id`/`episode`) —
+      пустой дифф, как раньше: `end` с итогом закрывает эпизод одним итогом.
+
+    Всё прочее — ValidationError до любой записи. Форма проверяется и внутри операций
+    (операция — объект с именем-строкой, запись — объект, доказательства и связи — списки),
+    иначе `end` и `commit` упали бы на них трассировкой. Сами записи (тип, раздел, источники,
+    секреты) проверяет общий путь записи."""
+    if raw is None:
+        return None
+    if isinstance(raw, dict) and not raw.keys() - {"diff_id", "episode"}:
+        raw = {"ops": [], **raw}
+    if isinstance(raw, list):
+        for i, item in enumerate(raw):
+            if not isinstance(item, dict):
+                raise S.ValidationError(f"diff item {i} is not an object; the diff file must be {DIFF_FORMS}")
+            if "op" in item or "ops" in item:
+                raise S.ValidationError(f"diff item {i} is an operation, not a record: a plain list holds records "
+                                        'only; put operations into {"ops": [...]}')
+        diff: dict = {"ops": [{"op": "ADD", "record": rec} for rec in raw]}
+    elif isinstance(raw, dict) and "ops" in raw:
+        stray = sorted({"op", "type", "statement", "record"} & raw.keys())
+        if stray:
+            raise S.ValidationError(f"the diff has both `ops` and record fields {stray}; the diff file must be "
+                                    f"{DIFF_FORMS}")
+        if not isinstance(raw["ops"], list):
+            raise S.ValidationError("`ops` must be a list of operations")
+        diff = raw
+    elif isinstance(raw, dict) and "op" in raw:
+        raise S.ValidationError('the diff is a single operation; wrap it as {"ops": [...]}')
+    elif isinstance(raw, dict) and ("type" in raw or "statement" in raw):
+        diff = {"ops": [{"op": "ADD", "record": raw}]}
+    else:
+        raise S.ValidationError(f"unrecognised diff ({type(raw).__name__}); the diff file must be {DIFF_FORMS}")
+    for i, op in enumerate(diff["ops"]):
+        if not isinstance(op, dict):
+            raise S.ValidationError(f"op {i} must be an object")
+        if not isinstance(op.get("op"), str):
+            raise S.ValidationError(f"op {i}: `op` must be one of {OPS}")
+        rec = op.get("record")
+        if rec is not None and not isinstance(rec, dict):
+            raise S.ValidationError(f"op {i}: `record` must be an object")
+        _need_evidence_list(op.get("evidence"), f"op {i}: `evidence`")
+        _need_evidence_list((rec or {}).get("evidence"), f"op {i}: record `evidence`")
+        _need_links((rec or {}).get("links"), f"op {i}: record `links`")
+    return diff
+
+
 def apply_diff(mem, diff: dict, episode: str | None = None) -> dict:
+    diff = normalize_diff(diff) or {}
     ops = diff.get("ops")
     if not isinstance(ops, list) or not ops:
         raise S.ValidationError("diff must have a non-empty `ops` list")

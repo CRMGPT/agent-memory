@@ -29,7 +29,7 @@ from pathlib import Path
 from . import checks, faults
 from . import schema as S
 from .codegraph import read_lines
-from .diff import diff_identity
+from .diff import diff_identity, normalize_diff
 from .memory import refuse_secrets
 from .retrieval import Retriever
 from .session import Leases
@@ -442,8 +442,9 @@ class Context:
             pending.append(f"working.md ({type(exc).__name__}: {exc})")
         return {"pending_derived": pending}
 
-    def end(self, diff: dict | None, summary: str | None = None, working: str | None = None) -> dict:
+    def end(self, diff: dict | list | None, summary: str | None = None, working: str | None = None) -> dict:
         refuse_secrets(diff, summary, working, what="the episode result")
+        diff = normalize_diff(diff)  # список записей и одна запись — тоже ADD; прочее — отказ до записи
         self._authorize()
         ops = list((diff or {}).get("ops") or [])
         if summary:
@@ -457,7 +458,7 @@ class Context:
             self._check_working(working)
         for op in ops:  # итог эпизода ссылается на сам эпизод
             for ev in (op.get("record") or {}).get("evidence") or []:
-                if ev.get("ref") == "@episode":
+                if isinstance(ev, dict) and ev.get("ref") == "@episode":  # строка `вид:ссылка` — как есть
                     ev["ref"] = ep["id"]
         full = {"ops": ops, **({"diff_id": diff["diff_id"]} if diff and diff.get("diff_id") else {})}
         diff_id, _ = diff_identity(full, ep["id"]) if ops else (None, None)
@@ -564,7 +565,7 @@ class Context:
         if last and last.get("owner_token") == self.session and last["status"] == "committed":
             for op in ops:
                 for ev in (op.get("record") or {}).get("evidence") or []:
-                    if ev.get("ref") == "@episode":
+                    if isinstance(ev, dict) and ev.get("ref") == "@episode":
                         ev["ref"] = last["id"]
             full = {"ops": ops, **({"diff_id": diff["diff_id"]} if diff and diff.get("diff_id") else {})}
             diff_id, _ = diff_identity(full, last["id"]) if ops else (None, None)

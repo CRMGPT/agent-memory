@@ -1,6 +1,6 @@
 {
   "name": "agent-memory",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Persistent per-project memory for coding work: facts, decisions and rules of each project with sources and freshness. Read automatically by hooks; written only by the task's single executor.",
   "author": {
     "name": "CRMGPT",

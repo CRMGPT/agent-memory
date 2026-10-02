@@ -11,7 +11,7 @@
       "name": "agent-memory",
       "source": "./",
       "description": "Persistent per-project memory for coding work, read by hooks and written by one executor.",
-      "version": "0.1.0"
+      "version": "0.1.1"
     }
   ]
 }

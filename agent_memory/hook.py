@@ -143,10 +143,11 @@ def integration_note(root: str, commands: list[tuple[str, str]], version: str | 
         "project directory:\n"
         '1. Start: MEM begin "<short task>" - keep the printed session token for this task only (do not export '
         "it, do not pass it to other agents).\n"
-        "2. After the result is checked: save only NEW verified knowledge - write a JSON diff file with records "
-        '{"type": "DECISION|FACT|CONSTRAINT|BUG", "section": "code|logic|data|workflow", "statement": "...", '
-        '"evidence": [{"kind": "file", "ref": "<path>"}]} and run MEM end --session <token> --diff <file> '
-        '--summary "<one line>"; nothing new -> MEM drop --session <token> --reason "no new knowledge".\n'
+        "2. After the result is checked: save only NEW verified knowledge - write a JSON file with a list of "
+        'records, for example [{"type": "FACT", "section": "code", "statement": "...", "evidence": [{"kind": '
+        '"file", "ref": "<path>"}]}] (type DECISION|FACT|CONSTRAINT|BUG, section code|logic|data|workflow), and '
+        'run MEM end --session <token> --diff <file> --summary "<one line>"; nothing new -> MEM drop --session '
+        '<token> --reason "no new knowledge".\n'
         "3. Only when the whole task is finished (review, fixes and delivery included): MEM session finish "
         "--session <token>. The end of a response is not the end of the task.\n"
         "Other agents (coordinator, agent-memory:researcher, agent-memory:reviewer) do not run MEM. A refusal (exit code not 0) is a real "

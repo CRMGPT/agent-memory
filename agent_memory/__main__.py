@@ -34,14 +34,18 @@ def _roots(root: Path) -> tuple[str, ...]:
     return found or (".",)
 
 
-def _load(arg: str | None) -> dict | None:
+def _load(arg: str | None):
     if arg is None:
         return None
     if arg == "-":
         return json.load(sys.stdin)
     if arg.lstrip().startswith(("{", "[")):
         return json.loads(arg)
-    return json.loads(Path(arg).read_text(encoding="utf-8"))
+    try:
+        text = Path(arg).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:  # каталог, нет прав, не UTF-8 — отказ без трассировки
+        raise S.ValidationError(f"cannot read JSON file {arg!r} ({type(exc).__name__}: {exc})") from exc
+    return json.loads(text)
 
 
 SECTION_HELP = ("comma-separated sections: code, logic, data, workflow (and unclassified for records from "

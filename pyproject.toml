@@ -1,6 +1,6 @@
 [project]
 name = "agent-memory"
-version = "0.1.0"
+version = "0.1.1"
 description = "Persistent per-project memory for coding agents (Claude Code): facts, decisions and rules with sources, read automatically, written by one executor."
 requires-python = ">=3.10"
 license = { text = "MIT" }

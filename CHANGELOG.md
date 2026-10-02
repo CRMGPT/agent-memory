@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1 - 2026-10-02
+
+- Fix: `end --diff` and `commit` crashed with a traceback on a JSON list of records, which is the
+  form the session-start instruction described; a single record was silently not saved by `end`.
+  Both forms are now accepted (each record becomes an ADD), the full `{"ops": [...]}` form works
+  as before, and any other shape is refused with exit code 2 before anything is written, by both
+  `end` (the episode stays open) and `commit`.
+- Unchanged: evidence written as a `kind:ref` string is still accepted, and an empty diff with
+  `--summary` still closes the episode with its summary.
+- An unreadable diff file (a directory, not UTF-8) is a clean refusal instead of a traceback.
+- The hook instruction, the skill, the executor role and the README show the exact accepted file.
+
 ## 0.1.0 - 2026-10-02
 
 First public version, packaged as a Claude Code plugin.

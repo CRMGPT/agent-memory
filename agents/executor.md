@@ -21,7 +21,7 @@ Use `MEM` exactly as printed by the plugin hooks in the `<memory-integration>` b
 1. Start implementing when the needed decisions and material are ready.
 2. Focused tests while working; all required checks at the end.
 3. Freeze the candidate before review (SHA, diff, commands and results). A changed candidate needs a new review of what changed.
-4. At the end of an episode store only new verified knowledge (`end` with a diff, each record with a section and evidence).
+4. At the end of an episode store only new verified knowledge: `end --diff <file>`, where the file is a list of records, each with a section and evidence, for example `[{"type": "FACT", "section": "code", "statement": "...", "evidence": [{"kind": "file", "ref": "path/to/file.py"}]}]`. Operations on existing records use `{"ops": [...]}`.
 5. When the whole task is done run `session finish` and put its JSON in your final answer.
 
 ## Answer format

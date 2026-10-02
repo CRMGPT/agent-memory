@@ -41,13 +41,17 @@ MEM end --diff diff.json --summary "<one line>" --session <token>
 MEM session finish --session <token>                # only when the WHOLE task is done
 ```
 
-`end` brings this worktree's code map up to date by itself; no manual `index`. A diff record
-needs a section and evidence:
+`end` brings this worktree's code map up to date by itself; no manual `index`. The diff file
+is a list of new records; each needs a section and evidence:
 
 ```json
-{"ops": [{"op": "ADD", "record": {"type": "DECISION", "section": "logic",
-  "statement": "One claim, one record", "evidence": [{"kind": "file", "ref": "path/to/file.py"}]}}]}
+[{"type": "DECISION", "section": "logic", "statement": "One claim, one record",
+  "evidence": [{"kind": "file", "ref": "path/to/file.py"}]}]
 ```
+
+A single record object is also accepted. Operations on existing records (UPDATE, SUPERSEDE,
+INVALIDATE and others) use the full form `{"ops": [{"op": "ADD", "record": {...}}, ...]}`.
+Any other shape is refused and nothing is saved.
 
 Sections: `code` (structure, modules, entry points), `logic` (rules, decisions, constraints),
 `data` (schemas, formats, sources - no client records), `workflow` (run, test, deliver).

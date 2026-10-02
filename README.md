@@ -70,6 +70,10 @@ MEM end --session <token> --diff diff.json --summary "<one line>"
 MEM session finish --session <token>        # only when the whole task is done
 ```
 
+`diff.json` is a list of new records, each with a section and a source:
+`[{"type": "FACT", "section": "code", "statement": "...", "evidence": [{"kind": "file", "ref": "path/to/file.py"}]}]`.
+Changes to existing records use the full form `{"ops": [...]}` described in the skill.
+
 Other useful commands: `MEM where` (which memory this folder uses, read-only), `MEM search "<words>"`,
 `MEM doctor`, `MEM selftest [file]` (runs the tests and writes a diagnostics file without personal
 paths or memory contents). The skill `agent-memory:project-memory` describes the full procedure.
@@ -121,7 +125,7 @@ pass. Memory stays on your computer; the plugin sends nothing anywhere.
 
 Verified: Windows (native and with WSL). Not verified: macOS, Linux outside WSL — support is not confirmed.
 
-- No guarantees: this is early software (version 0.1.0).
+- No guarantees: this is early software (version 0.1.1).
 - Memory is as good as what was recorded; check the cited source before relying on a fact.
 - The hooks add a bounded amount of text (at most about 6000 characters per event).
 
